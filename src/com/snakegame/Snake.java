@@ -13,8 +13,9 @@ public class Snake extends Field {
 	private Terminal terminal;
 	private Screen screen;
 	private TextGraphics textGraphics;
-    private LinkedList<Cordinates> snake = new LinkedList<Cordinates>() ;
-	Cordinates begining = new Cordinates(0,0);
+	//
+   // private LinkedList<Cordinates> snake = new LinkedList<Cordinates>() ;
+	Coordinates begining = new Coordinates(0,0);
     boolean boolReverse = false;
     private String file;
     private boolean restart = true;
@@ -32,7 +33,7 @@ public class Snake extends Field {
 	        //Loading Field
 	        field.loadField(textGraphics, file);
 	        //Loading Snake at the center of the field
-	        field.snakeMove(snake, begining, movesCount, boolReverse);
+	        field.snakeMove(begining, movesCount, boolReverse);
 	        while (!field.hitBrick) {
 	            KeyStroke keyStroke = terminal.pollInput();
 	            //Initialize next move
@@ -54,8 +55,8 @@ public class Snake extends Field {
 	                        //If snake is already moving right, it cannot move left
 	                    	if(begining.getX() != 1 || begining.getY() != 0 ) {
 	                    		movesCount++;
-		                		begining = new Cordinates(0,-1);
-		                    	field.snakeMove(snake, begining, movesCount,boolReverse);
+		                		begining = new Coordinates(0,-1);
+		                    	field.snakeMove(begining, movesCount,boolReverse);
 		                    	if(field.isReverseMovement() == true) {
 		                    		field.Printer(textGraphics, "Now the snake is reversing its direction.");
 		    	            		screen.refresh();
@@ -79,8 +80,8 @@ public class Snake extends Field {
 	                    case ArrowRight: 
 	                    	if(begining.getX() != -1 || begining.getY() != 0) {
 	                    		 movesCount++;
-	     	                    begining = new Cordinates(0,1);
-	     	                    field.snakeMove(snake, begining, movesCount,boolReverse);
+	     	                    begining = new Coordinates(0,1);
+	     	                    field.snakeMove(begining, movesCount,boolReverse);
 	     	                   if(field.isReverseMovement() == true) {
 		                    		field.Printer(textGraphics, "Now the snake is reversing its direction.");
 		    	            		screen.refresh();
@@ -102,8 +103,8 @@ public class Snake extends Field {
 	                     	if(begining.getY()!= -1)
 	                    	{
 	                    		 movesCount++;
-	 	 	                    begining = new Cordinates(1,0);
-	 	 	                    field.snakeMove(snake, begining, movesCount,boolReverse);
+	 	 	                    begining = new Coordinates(1,0);
+	 	 	                    field.snakeMove(begining, movesCount,boolReverse);
 	 	 	              	screen.refresh();
 	 	 	              if(field.isReverseMovement() == true) {
 	                    		field.Printer(textGraphics, "Now the snake is reversing its direction.");
@@ -127,8 +128,8 @@ public class Snake extends Field {
 	                    	if(begining.getY()!= 1)
 	                    	{
 	                    		movesCount++;
-		 	                    begining = new Cordinates(-1,0);
-		 	                    field.snakeMove(snake, begining, movesCount,boolReverse);
+		 	                    begining = new Coordinates(-1,0);
+		 	                    field.snakeMove(begining, movesCount,boolReverse);
 		 	                   if(field.isReverseMovement() == true) {
 		                    		field.Printer(textGraphics, "Now the snake is reversing its direction.");
 		    	            		screen.refresh();

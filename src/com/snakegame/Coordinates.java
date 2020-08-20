@@ -1,6 +1,6 @@
 package com.snakegame;
 
-public class Cordinates {
+public class Coordinates {
 
 	private int x;
 	private int y;
@@ -20,7 +20,7 @@ public class Cordinates {
 		this.y =y;
 	}
 	
-	public Cordinates(int y, int x) {
+	public Coordinates(int y, int x) {
 		this.x = x;
 		this.y = y;
 	}

@@ -1,9 +1,9 @@
 package com.snakegame;
 import java.io.File;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Collections;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
 
@@ -13,14 +13,15 @@ public class Field {
 	final char Snake = '*';
 	final char Apple = 'o';
     final char Pear = 'p';
-    protected LinkedList<Cordinates> bricks =  new LinkedList<Cordinates>();
-	protected LinkedList<Cordinates> grass = new LinkedList<Cordinates>();
+    private LinkedList<Coordinates> bricks =  new LinkedList<Coordinates>();
+	private LinkedList<Coordinates> grass = new LinkedList<Coordinates>();
+	private LinkedList<Coordinates> snake = new LinkedList<Coordinates>() ;
     protected int width;
 	protected int height;
 	protected char [][] field;
 	protected boolean hitBrick;
 	protected boolean ReverseMovement = false;
-	
+	int copyX,copyY;
 	protected int grassRandomIndex = 0;
 	 
 
@@ -30,40 +31,56 @@ public class Field {
 				File file = new File(filename);
 				Scanner readFile = new Scanner(file);
 				String readWidth = readFile.nextLine();
-				String readHeight = readFile.nextLine();
-				//Reads first line for Height and 2nd line for width
-			
+				String readHeight = readFile.nextLine();			
 			    width = Integer.parseInt(readWidth);
 			    height = Integer.parseInt(readHeight);
-			    field = new char[height][width];
-			    //Draws map
-				//Map = readFile.nextLine();    
+			    field = new char[height][width]; 
 			    while(readFile.hasNextLine()) {
 			    	for(int i = 0; i<height;i++) {
 			    	String d = readFile.nextLine();
 			    	  for(int j = 0; j<width; j++) {
 			    		field[i][j] = d.charAt(j);
 			    		if(field[i][j]==Brick) {
-			    			bricks.add(new Cordinates(i,j));
+			    			bricks.add(new Coordinates(i,j));
 			    		}
 			    	  }
-			       
-			       
-			    	}
+			  	   }
 			    }
-			    
-			    
-			    
-			    readFile.close();
+		   readFile.close();
 		}
 			catch(Exception ex) {
 			System.out.println("Error");
 		}
-			
-	        
-	    }
+	}
 
- 
+  void drawObject(char[][] field, char ch,Coordinates cordinates) {
+	  field[cordinates.getY()][cordinates.getX()] = ch;
+		/*
+		 * if(ch==Snake) { snake.add(0,new
+		 * Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
+		 * 
+		 * }
+		 */
+  }
+  boolean isObject(char ch, Coordinates cordinates) {
+	  if(field[cordinates.getY()][cordinates.getX()] == ch) {
+	   return true;
+	  }
+	  else {
+		  return false;
+	  }
+  }
+  boolean isObject(char ch,char ch2, Coordinates cordinates) {
+	  if(field[cordinates.getY()][cordinates.getX()] == ch || field[cordinates.getY()][cordinates.getX()]==ch2) {
+	   return true;
+	  }
+	  else {
+		  return false;
+	  }
+  }
+  void deleteSnakeTail(char[][]field,LinkedList<Coordinates> snake) {
+		field[snake.getLast().getY()][snake.getLast().getX()] = Grass;
+  }
 	   protected void printMap(TextGraphics textGraphics) {
 			for (int row = 0; row < height; row++)
 			{
@@ -73,99 +90,76 @@ public class Field {
 			    }
 			}
 		}
-	static int startx = 0;
-	static int starty=0;
-   protected void printSnake(LinkedList<Cordinates> snake) {
-	   for(int i = 0; i<snake.size();i++) {		   
-		   field[snake.get(i).getY()][snake.get(i).getX()] = Snake;
-	   }
+void initializeSnake(char[][] field) {
+	int x = field[1].length/2;
+	int y = field.length/2;
+	//Head
+    field[y-1][x] = Snake;
+	//Center of the Snake segment
+	field[y][x] = Snake;	
+	//Tail 
+	field[y+1][x] = Snake;
+	
+   for(int i=0; i<3;i++) {
+	   snake.add(i, new Coordinates(y-1+i, x));
    }
-	protected void snakeMove(LinkedList<Cordinates> snake,Cordinates cordinates,int movesCount,Boolean bool) {
-		
-		if(movesCount == 0) {
-			int x = field[1].length/2;
-			int y = field.length/2;
-			startx=x;
-			starty=y;
-			//Head
-	        field[y-1+cordinates.getY()][x+cordinates.getX()] = Snake;
-			//Center of the Snake segment
-			field[y+cordinates.getY()][x+cordinates.getX()] = Snake;	
-			//Tail 
-			field[y+1+cordinates.getY()][x+cordinates.getX()] = Snake;
-			
-	       for(int i=0; i<3;i++) {
-	    	   snake.add(i, new Cordinates(y-1+i, x));
-	       }
-	       generateFruit(field);
+   generateFruit(field);
+}
+//TODO Simplify 
+	protected void snakeMove(Coordinates cordinates,int movesCount,Boolean bool) {
+		if(movesCount==0) {
+			initializeSnake(field);
 		}
-		
-		else {	
-			startx=snake.getFirst().getX();
-			starty =snake.getFirst().getY();
-			if(field[starty+cordinates.getY()][startx+cordinates.getX()] == Brick || field[starty+cordinates.getY()][startx+cordinates.getX()]==Snake ) {
-		   
+		else {
+			copyX=snake.getFirst().getX();
+			copyY =snake.getFirst().getY();
+			if(isObject(Brick,Snake,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()))){
 				hitBrick = true;
 			}
 			
-			//head
-			 if(movesCount%20==0) {
+			if(movesCount%20==0) {
 				 generateFruit(field);
 			 }
-			if(field[starty+cordinates.getY()][startx+cordinates.getX()]==Grass) {
-				field[snake.getFirst().getY()+cordinates.getY()][snake.getFirst().getX()+cordinates.getX()] = '*';
-				 //coordinates of head
-				snake.add(0,new Cordinates(starty+cordinates.getY(),startx+cordinates.getX()));
-				//Delete tail 
-				field[snake.getLast().getY()][snake.getLast().getX()] = Grass;
+			if (isObject(Grass,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()))){
+				drawObject(field,Snake,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
+
+				
+				snake.add(0,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
+				deleteSnakeTail(field,snake);
 				snake.removeLast();
 			}
-			if(field[starty+cordinates.getY()][startx+cordinates.getX()]==Apple) {
-				field[starty+cordinates.getY()][startx+cordinates.getX()] =Snake;
-				snake.add(0,new Cordinates(starty+cordinates.getY(),startx+cordinates.getX()));
+				if(isObject(Apple,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX())))
+{
+				drawObject(field,Snake,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
+				snake.add(0,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
 				
 			}
-			if(field[starty+cordinates.getY()][startx+cordinates.getX()]==Pear) {
-				field[starty+cordinates.getY()][startx+cordinates.getX()] =Snake;
-				snake.add(0,new Cordinates(starty+cordinates.getY(),startx+cordinates.getX()));
+			if(isObject(Pear,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX())))
+				{
+				drawObject(field,Snake,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
+				snake.add(0,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()));
 				//Reverse the indexes of the LinkedList<Cordinates>snake 
 				//The first index becomes the last and so on...
 				Collections.reverse(snake);
-				startx = snake.getFirst().getX();
-				starty=snake.getFirst().getY();
+				copyX = snake.getFirst().getX();
+				copyY=snake.getFirst().getY();
 				ReverseMovement=true;
 				
-			}
-			
-		
-			 
-			  
-			 
-			  
-			
-
-			
-				
+			}		
 			
 		}
-
-		
 	}
-	
-	
-   
-
 	     protected void generateFruit(char[][] fruit) {
 	    	
 	    	     if(grassRandomIndex != 0) {
 		    	    field[grass.get(grassRandomIndex).getY()][grass.get(grassRandomIndex).getX()] =Grass;
 
 	    		}
-	    	     grass = new LinkedList<Cordinates>();
+	    	     grass = new LinkedList<Coordinates>();
 	 	    	for(int i = 0; i<height; i++) {
 	 	    		for(int j = 0; j<width; j++) {
 	 	    			if(field[i][j]==Grass) {
-	 	    				grass.add(new Cordinates(i,j));
+	 	    				grass.add(new Coordinates(i,j));
 	 	    				
 	 	    			}
 	 	    			
@@ -175,16 +169,21 @@ public class Field {
 	    		Random random = new Random();
 	    	    grassRandomIndex = random.nextInt(grass.size());
 	    		int probability = random.nextInt(5);
-	    		switch(probability) {
-	    		case 0: fruitch=Apple;break;
-	    		case 1: fruitch=Apple;break;
-	    		case 2: fruitch=Apple; break;
-	    		case 3: fruitch=Pear; break;
-	    		case 4: fruitch=Apple; break;
-	    		case 5: fruitch=Apple; break;
+	    		if (probability == 1) {
+	    			fruitch = Pear;
 	    		}
-	    	    field[grass.get(grassRandomIndex).getY()][grass.get(grassRandomIndex).getX()] = fruitch;
-	    		
+	    		else {
+	    			fruitch = Apple;
+	    		}
+				/*
+				 * switch(probability) { case 0: fruitch=Apple;break; case 1:
+				 * fruitch=Apple;break; case 2: fruitch=Apple; break; case 3: fruitch=Pear;
+				 * break; case 4: fruitch=Apple; break; case 5: fruitch=Apple; break; }
+				 */
+	    	   // field[grass.get(grassRandomIndex).getY()][grass.get(grassRandomIndex).getX()] = fruitch;
+	    		//Generate fruit on random grass cordinates
+	    	    Coordinates fruitCordinates = new Coordinates(grass.get(grassRandomIndex).getY(),grass.get(grassRandomIndex).getX());
+	    		drawObject(field,fruitch,fruitCordinates);
 	    	}
 	    	
 	    
