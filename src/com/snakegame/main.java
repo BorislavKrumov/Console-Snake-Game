@@ -44,7 +44,6 @@ public class main extends Snake {
 					snake.playGame(filePath);
 					isFileValid= true;
 					 while(snake.isRestart()==true) {
-							//snake = null;
 						    snake = new Snake();
 							new Field();
 							snake.playGame(filePath);
