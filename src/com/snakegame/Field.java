@@ -8,21 +8,37 @@ import java.util.Scanner;
 import com.googlecode.lanterna.graphics.TextGraphics;
 
 public class Field {
-	final char Brick = '#';
-	final char Grass = ' ';
-	final char Snake = '*';
-	final char Apple = 'o';
-    final char Pear = 'p';
+	private final char Brick = '#';
+	private final char Grass = ' ';
+	private final char Snake = '*';
+	private final char Apple = 'o';
+    private final char Pear = 'p';
     private LinkedList<Coordinates> bricks =  new LinkedList<Coordinates>();
 	private LinkedList<Coordinates> grass = new LinkedList<Coordinates>();
 	private LinkedList<Coordinates> snake = new LinkedList<Coordinates>() ;
-    protected int width;
-	protected int height;
-	protected char [][] field;
-	protected boolean hitBrick;
-	protected boolean ReverseMovement = false;
-	int copyX,copyY;
-	protected int grassRandomIndex = 0;
+    private int width;
+    public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	private int height;
+	private char [][] field;
+	private boolean hitBrick;
+	private boolean ReverseMovement = false;
+	private int copyX,copyY;
+	private int grassRandomIndex = 0;
 	 
 
 	 
@@ -90,7 +106,7 @@ public class Field {
 			    }
 			}
 		}
-void initializeSnake(char[][] field) {
+private void initializeSnake(char[][] field) {
 	int x = field[1].length/2;
 	int y = field.length/2;
 	//Head
@@ -114,7 +130,7 @@ void initializeSnake(char[][] field) {
 			copyX=snake.getFirst().getX();
 			copyY =snake.getFirst().getY();
 			if(isObject(Brick,Snake,new Coordinates(copyY+cordinates.getY(),copyX+cordinates.getX()))){
-				hitBrick = true;
+				setHitBrick(true);
 			}
 			
 			if(movesCount%20==0) {
@@ -149,10 +165,10 @@ void initializeSnake(char[][] field) {
 			
 		}
 	}
-	     protected void generateFruit(char[][] fruit) {
+	     private void generateFruit(char[][] fruit) {
 	    	
 	    	     if(grassRandomIndex != 0) {
-		    	    field[grass.get(grassRandomIndex).getY()][grass.get(grassRandomIndex).getX()] =Grass;
+	    	    	drawObject(field,Grass,new Coordinates(grass.get(grassRandomIndex).getY(),grass.get(grassRandomIndex).getX()));
 
 	    		}
 	    	     grass = new LinkedList<Coordinates>();
@@ -175,40 +191,26 @@ void initializeSnake(char[][] field) {
 	    		else {
 	    			fruitch = Apple;
 	    		}
-				/*
-				 * switch(probability) { case 0: fruitch=Apple;break; case 1:
-				 * fruitch=Apple;break; case 2: fruitch=Apple; break; case 3: fruitch=Pear;
-				 * break; case 4: fruitch=Apple; break; case 5: fruitch=Apple; break; }
-				 */
-	    	   // field[grass.get(grassRandomIndex).getY()][grass.get(grassRandomIndex).getX()] = fruitch;
-	    		//Generate fruit on random grass cordinates
 	    	    Coordinates fruitCordinates = new Coordinates(grass.get(grassRandomIndex).getY(),grass.get(grassRandomIndex).getX());
 	    		drawObject(field,fruitch,fruitCordinates);
 	    	}
 	    	
 	    
-	//Method for printing warning message
-		protected void Printer(TextGraphics textGraphics, String string) {
-		
-			textGraphics.putCSIStyledString(0, height+1, string);
-
-        
-		}
-		//Method for clearing the warning message
-		protected void PrinterRelease(TextGraphics textGraphics, String string) {
-                    
-			String ch = " ";
-		    	  for(int i = 0; i<string.length(); i++) {	
-		    		  		    		  		 
-		    		  		 textGraphics.putCSIStyledString(i, height+1, ch);
-		    		}
-		    	  		    	  
-		}
+	
 		protected boolean isReverseMovement() {
 			return this.ReverseMovement;
 		}
 		protected void setReverseMovement(boolean reverseMovement) {
 			ReverseMovement = reverseMovement;
 			
+		}
+
+		public boolean isHitBrick() {
+			return hitBrick;
+		}
+
+		public boolean setHitBrick(boolean hitBrick) {
+			this.hitBrick = hitBrick;
+			return hitBrick;
 		}
 }
